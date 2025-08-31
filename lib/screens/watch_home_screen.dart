@@ -682,13 +682,6 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
     if (_currentSteps! >= 2000) return '보통';
     return '-부족';
   }
-
-  Color _getImpactColor(String impact) {
-    if (impact.startsWith('+')) return Colors.green;
-    if (impact.startsWith('-')) return Colors.orange;
-    if (impact == '측정 중') return Colors.grey;
-    return Colors.white60;
-  }
   
   Color _getHRVColor() {
     if (_currentHRV == null) return Colors.grey;
