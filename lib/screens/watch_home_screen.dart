@@ -139,7 +139,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Container(
-          padding: EdgeInsets.all(isRoundWatch ? 16 : 12),
+          padding: EdgeInsets.all(isRoundWatch ? 10 : 8),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -159,15 +159,15 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                   ],
                 ],
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 4),
 
               // 배터리 게이지
               BatteryGauge(
                 battery: _currentBattery!,
-                size: MediaQuery.of(context).size.width * 0.55,
+                size: MediaQuery.of(context).size.width * 0.45,
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
 
               // 상태 텍스트
               Text(
@@ -175,41 +175,41 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 style: const TextStyle(color: Colors.white70, fontSize: 12),
               ),
 
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
 
               // 레벨 설명
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: _currentBattery!.color.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
                   _currentBattery!.levelDescription.split(' - ')[0],
                   style: TextStyle(
                     color: _currentBattery!.color,
-                    fontSize: 10,
+                    fontSize: 9,
                     fontWeight: FontWeight.w500,
                   ),
                   textAlign: TextAlign.center,
                 ),
               ),
 
-              const SizedBox(height: 6),
+              const SizedBox(height: 4),
 
               // 추천사항 (간단히)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
                   _getShortRecommendation(),
-                  style: const TextStyle(color: Colors.white54, fontSize: 9),
+                  style: const TextStyle(color: Colors.white54, fontSize: 8),
                   textAlign: TextAlign.center,
-                  maxLines: 2,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 6),
 
               // 구분선
               Container(
@@ -218,22 +218,22 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 color: Colors.white24,
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
 
               // 상세 정보 섹션
               _buildDetailSection(context),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
 
-              // 계산 근거 섹션
+              // 계산 근거 셉션
               _buildCalculationSection(context),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
 
-              // 센서 데이터 섹션
+              // 센서 데이터 셉션
               _buildSensorDataSection(context),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
             ],
           ),
         ),
@@ -578,7 +578,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -588,27 +588,29 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
             color.withValues(alpha: 0.05),
           ],
         ),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: color.withValues(alpha: 0.3),
-          width: 1,
+          width: 0.5,
         ),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(icon, size: 22, color: color),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: Colors.white60,
-              fontSize: 10,
-            ),
-          ),
-          const SizedBox(height: 2),
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 12, color: color),
+              const SizedBox(width: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  color: Colors.white60,
+                  fontSize: 7,
+                ),
+              ),
+            ],
+          ),
+          Row(
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [
@@ -616,17 +618,17 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 value,
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 16,
+                  fontSize: 11,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               if (unit.isNotEmpty) ...[
-                const SizedBox(width: 2),
+                const SizedBox(width: 1),
                 Text(
                   unit,
                   style: TextStyle(
                     color: Colors.white54,
-                    fontSize: 10,
+                    fontSize: 6,
                   ),
                 ),
               ],
