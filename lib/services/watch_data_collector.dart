@@ -47,6 +47,12 @@ class WatchDataCollector {
       // 패시브 모니터링 시작
       await _healthService.startPassiveMonitoring();
       
+      // 초기 데이터 수집
+      final initialData = await _healthService.getCurrentData();
+      if (initialData != null) {
+        debugPrint('초기 데이터: HR=${initialData.heartRate}, HRV=${initialData.heartRateVariability}, Steps=${initialData.steps}, Stress=${initialData.stressLevel}');
+      }
+      
       debugPrint('WatchDataCollector 초기화 완료');
       return true;
     } catch (e) {
@@ -77,13 +83,17 @@ class WatchDataCollector {
   }
   
   /// 실시간 모니터링 시작
-  void startRealTimeMonitoring() {
+  void startRealTimeMonitoring() async {
     if (_isMonitoring) {
       debugPrint('이미 모니터링 중');
       return;
     }
     
     _isMonitoring = true;
+    
+    // 즉시 현재 데이터 수집
+    await _collectAndSendHealthData();
+    await _collectAndSendBatteryData();
     
     // 헬스 데이터 수집 타이머
     _dataCollectionTimer = Timer.periodic(_healthDataInterval, (_) async {
@@ -208,6 +218,11 @@ class WatchDataCollector {
   /// 현재 배터리 레벨 가져오기 (워치 로컬 표시용)
   BodyBattery getCurrentBattery() {
     return _batteryCalculator.getCurrentBattery();
+  }
+  
+  /// 현재 헬스 데이터 가져오기 (워치 로컬 표시용)
+  Future<HealthData?> getCurrentHealthData() async {
+    return await _healthService.getCurrentData();
   }
   
   /// 배터리 스트림 (워치 로컬 UI 업데이트용)
