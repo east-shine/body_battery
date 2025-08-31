@@ -119,11 +119,11 @@ class WearHealthService {
       return SleepData(
         startTime: DateTime.fromMillisecondsSinceEpoch(result['startTime']),
         endTime: DateTime.fromMillisecondsSinceEpoch(result['endTime']),
-        deepSleepMinutes: result['deepSleep'] ?? 0,
-        remSleepMinutes: result['remSleep'] ?? 0,
-        lightSleepMinutes: result['lightSleep'] ?? 0,
-        awakeMinutes: result['awake'] ?? 0,
-        quality: _calculateSleepQuality(result),
+        deepSleepMinutes: result['deepSleepMinutes'] ?? 0,
+        remSleepMinutes: result['remSleepMinutes'] ?? 0,
+        lightSleepMinutes: result['lightSleepMinutes'] ?? 0,
+        awakeMinutes: result['awakeMinutes'] ?? 0,
+        quality: result['quality'] ?? 75.0,
       );
     } catch (e) {
       debugPrint('수면 데이터 가져오기 실패: $e');
@@ -140,9 +140,9 @@ class WearHealthService {
       
       return results.map((data) => ActivityData(
         type: data['type'] as String,
-        durationMinutes: data['duration'] as int,
+        durationMinutes: data['durationMinutes'] as int,
         intensity: data['intensity'] as double,
-        caloriesBurned: data['calories'] as int,
+        caloriesBurned: data['caloriesBurned'] as int,
       )).toList();
     } catch (e) {
       debugPrint('활동 데이터 가져오기 실패: $e');
@@ -188,10 +188,10 @@ class WearHealthService {
 
   /// 수면 품질 계산
   double _calculateSleepQuality(Map<dynamic, dynamic> sleepData) {
-    final deep = sleepData['deepSleep'] ?? 0;
-    final rem = sleepData['remSleep'] ?? 0;
-    final light = sleepData['lightSleep'] ?? 0;
-    final awake = sleepData['awake'] ?? 0;
+    final deep = sleepData['deepSleepMinutes'] ?? 0;
+    final rem = sleepData['remSleepMinutes'] ?? 0;
+    final light = sleepData['lightSleepMinutes'] ?? 0;
+    final awake = sleepData['awakeMinutes'] ?? 0;
     final total = deep + rem + light;
     
     if (total == 0) return 0;
