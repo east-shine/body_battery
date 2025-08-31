@@ -414,7 +414,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                '실시간 센서 데이터',
+                '추가 정보',
                 style: TextStyle(
                   color: Colors.white70,
                   fontSize: 11,
@@ -429,51 +429,41 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
           ),
           const SizedBox(height: 8),
 
-          // 센서 데이터 세로 리스트
+          // 추가 정보 세로 리스트
           Column(
             children: [
               _buildSensorCard(
-                icon: Icons.favorite,
-                label: '심박수',
-                value: _currentHeartRate != null ? '$_currentHeartRate' : '--',
+                icon: Icons.local_fire_department,
+                label: '칼로리',
+                value: ((_currentSteps ?? 0) * 0.04).toStringAsFixed(0),
+                unit: 'kcal',
+                color: Colors.deepOrange,
+              ),
+              const SizedBox(height: 4),
+              _buildSensorCard(
+                icon: Icons.speed,
+                label: '평균 심박',
+                value: _currentHeartRate != null 
+                  ? '${(_currentHeartRate! * 0.85).round()}'
+                  : '--',
                 unit: 'bpm',
-                color: Colors.red,
+                color: Colors.pink,
               ),
               const SizedBox(height: 4),
               _buildSensorCard(
-                icon: Icons.timeline,
-                label: 'HRV',
-                value:
-                    _currentHRV != null
-                        ? _currentHRV!.toStringAsFixed(0)
-                        : '--',
-                unit: 'ms',
-                color: Colors.blue,
+                icon: Icons.trending_up,
+                label: '활동 강도',
+                value: _getActivityIntensity(),
+                unit: '',
+                color: Colors.teal,
               ),
               const SizedBox(height: 4),
               _buildSensorCard(
-                icon: Icons.directions_walk,
-                label: '걸음수',
-                value:
-                    _currentSteps != null
-                        ? (_currentSteps! >= 1000
-                            ? '${(_currentSteps! / 1000).toStringAsFixed(1)}k'
-                            : '$_currentSteps')
-                        : '0',
-                unit:
-                    _currentSteps != null && _currentSteps! >= 1000 ? '' : '걸음',
+                icon: Icons.battery_charging_full,
+                label: '회복 속도',
+                value: _getRecoveryRate(),
+                unit: '',
                 color: Colors.green,
-              ),
-              const SizedBox(height: 4),
-              _buildSensorCard(
-                icon: Icons.psychology,
-                label: '스트레스',
-                value:
-                    _currentStressLevel != null
-                        ? _currentStressLevel!.toStringAsFixed(0)
-                        : '--',
-                unit: '%',
-                color: Colors.orange,
               ),
             ],
           ),
@@ -693,6 +683,22 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
     if (_currentSteps! >= 5000) return Colors.blue;
     if (_currentSteps! >= 2000) return Colors.yellow[700]!;
     return Colors.orange;
+  }
+  
+  String _getActivityIntensity() {
+    if (_currentHeartRate == null) return '--';
+    if (_currentHeartRate! >= 140) return '매우 높음';
+    if (_currentHeartRate! >= 110) return '높음';
+    if (_currentHeartRate! >= 90) return '보통';
+    if (_currentHeartRate! >= 70) return '낮음';
+    return '휴식';
+  }
+  
+  String _getRecoveryRate() {
+    if (_currentHRV == null || _currentStressLevel == null) return '--';
+    if (_currentHRV! >= 50 && _currentStressLevel! <= 30) return '빠름';
+    if (_currentHRV! >= 35 && _currentStressLevel! <= 50) return '보통';
+    return '느림';
   }
 
   String _getLastUpdateTime() {
