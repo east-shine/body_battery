@@ -356,43 +356,47 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
             crossAxisCount: 2,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            childAspectRatio: 1.3,
+            mainAxisSpacing: 4,
+            crossAxisSpacing: 4,
+            childAspectRatio: 2.2,
             children: [
               _buildFactorCard(
                 icon: Icons.favorite_border,
                 label: 'HRV',
-                value: _currentHRV != null 
-                  ? '${_currentHRV!.toStringAsFixed(0)}ms'
-                  : '--',
+                value:
+                    _currentHRV != null
+                        ? '${_currentHRV!.toStringAsFixed(0)}ms'
+                        : '--',
                 impact: _getHRVImpact(),
                 color: _getHRVColor(),
               ),
               _buildFactorCard(
                 icon: Icons.psychology_outlined,
                 label: '스트레스',
-                value: _currentStressLevel != null 
-                  ? '${_currentStressLevel!.toStringAsFixed(0)}%'
-                  : '--',
+                value:
+                    _currentStressLevel != null
+                        ? '${_currentStressLevel!.toStringAsFixed(0)}%'
+                        : '--',
                 impact: _getStressImpact(),
                 color: _getStressColor(),
               ),
               _buildFactorCard(
                 icon: Icons.monitor_heart_outlined,
                 label: '심박수',
-                value: _currentHeartRate != null 
-                  ? '${_currentHeartRate}bpm'
-                  : '--',
+                value:
+                    _currentHeartRate != null
+                        ? '${_currentHeartRate}bpm'
+                        : '--',
                 impact: _getHeartRateImpact(),
                 color: _getHeartRateColor(),
               ),
               _buildFactorCard(
                 icon: Icons.directions_walk,
                 label: '활동량',
-                value: _currentSteps != null 
-                  ? '${(_currentSteps! / 1000).toStringAsFixed(1)}k'
-                  : '0',
+                value:
+                    _currentSteps != null
+                        ? '${(_currentSteps! / 1000).toStringAsFixed(1)}k'
+                        : '0',
                 impact: _getActivityImpact(),
                 color: _getActivityColor(),
               ),
@@ -422,10 +426,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
               ),
               Text(
                 _getLastUpdateTime(),
-                style: const TextStyle(
-                  color: Colors.white38,
-                  fontSize: 9,
-                ),
+                style: const TextStyle(color: Colors.white38, fontSize: 9),
               ),
             ],
           ),
@@ -460,12 +461,14 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
               _buildSensorCard(
                 icon: Icons.directions_walk,
                 label: '걸음수',
-                value: _currentSteps != null 
-                  ? (_currentSteps! >= 1000 
-                    ? '${(_currentSteps! / 1000).toStringAsFixed(1)}k' 
-                    : '$_currentSteps')
-                  : '0',
-                unit: _currentSteps != null && _currentSteps! >= 1000 ? '' : '걸음',
+                value:
+                    _currentSteps != null
+                        ? (_currentSteps! >= 1000
+                            ? '${(_currentSteps! / 1000).toStringAsFixed(1)}k'
+                            : '$_currentSteps')
+                        : '0',
+                unit:
+                    _currentSteps != null && _currentSteps! >= 1000 ? '' : '걸음',
                 color: Colors.green,
               ),
               _buildSensorCard(
@@ -517,58 +520,53 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.grey.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-          width: 1,
-        ),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 0.5),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(icon, color: color, size: 20),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-            ),
+          Row(
+            children: [
+              Icon(icon, color: color, size: 14),
+              const SizedBox(width: 4),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 7,
+                    ),
+                  ),
+                  Text(
+                    impact,
+                    style: TextStyle(
+                      color: impact.startsWith('+') ? Colors.green : 
+                             impact.startsWith('-') ? Colors.orange : Colors.white60,
+                      fontSize: 6,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          const SizedBox(height: 2),
           Text(
             value,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 14,
+              fontSize: 11,
               fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Text(
-              impact,
-              style: TextStyle(
-                color: color,
-                fontSize: 9,
-                fontWeight: FontWeight.w600,
-              ),
             ),
           ),
         ],
       ),
     );
   }
-
 
   Widget _buildSensorCard({
     required IconData icon,
@@ -589,10 +587,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
           ],
         ),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-          width: 0.5,
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 0.5),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -601,13 +596,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
             children: [
               Icon(icon, size: 12, color: color),
               const SizedBox(width: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  color: Colors.white60,
-                  fontSize: 7,
-                ),
-              ),
+              Text(label, style: TextStyle(color: Colors.white60, fontSize: 7)),
             ],
           ),
           Row(
@@ -626,10 +615,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 const SizedBox(width: 1),
                 Text(
                   unit,
-                  style: TextStyle(
-                    color: Colors.white54,
-                    fontSize: 6,
-                  ),
+                  style: TextStyle(color: Colors.white54, fontSize: 6),
                 ),
               ],
             ],
@@ -684,28 +670,28 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
     if (_currentSteps! >= 2000) return '보통';
     return '-부족';
   }
-  
+
   Color _getHRVColor() {
     if (_currentHRV == null) return Colors.grey;
     if (_currentHRV! >= 50) return Colors.green;
     if (_currentHRV! >= 30) return Colors.blue;
     return Colors.orange;
   }
-  
+
   Color _getStressColor() {
     if (_currentStressLevel == null) return Colors.grey;
     if (_currentStressLevel! <= 30) return Colors.green;
     if (_currentStressLevel! <= 60) return Colors.yellow[700]!;
     return Colors.orange;
   }
-  
+
   Color _getHeartRateColor() {
     if (_currentHeartRate == null) return Colors.grey;
     if (_currentHeartRate! <= 60) return Colors.green;
     if (_currentHeartRate! <= 80) return Colors.blue;
     return Colors.orange;
   }
-  
+
   Color _getActivityColor() {
     if (_currentSteps == null) return Colors.grey;
     if (_currentSteps! >= 8000) return Colors.green;
