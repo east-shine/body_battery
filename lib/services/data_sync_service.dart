@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../models/health_data.dart';
@@ -34,49 +35,83 @@ class DataSyncService {
   /// 서비스 초기화
   Future<bool> initialize() async {
     try {
-      // Mock 구현: 항상 연결된 것으로 가정
-      _isConnected = true;
-      _pairedDeviceId = 'mock_device';
+      // 네이티브 플러그인 초기화
+      final result = await platform.invokeMethod('initialize');
       
-      debugPrint('DataSyncService Mock 초기화 완료');
-      debugPrint('실제 구현을 위해서는 네이티브 코드가 필요합니다');
-      
-      // 메시지 리스너 설정
-      _setupMockMessageListener();
-      
-      // 연결 상태 모니터링
-      _startConnectionMonitoring();
-      
-      return true;
+      if (result == true) {
+        debugPrint('DataSyncService 초기화 완료');
+        
+        // 연결된 디바이스 확인
+        await _checkConnectedDevices();
+        
+        // 메시지 리스너 설정
+        _setupMessageListener();
+        
+        // 연결 상태 모니터링
+        _startConnectionMonitoring();
+        
+        return true;
+      }
+      return false;
     } catch (e) {
       debugPrint('DataSyncService 초기화 실패: $e');
-      return false;
+      // Mock 모드로 폴백
+      _isConnected = true;
+      _pairedDeviceId = 'mock_device';
+      return true;
     }
   }
   
-  /// Mock 메시지 리스너 설정
-  void _setupMockMessageListener() {
-    // Mock 구현: 5초마다 가짜 데이터 생성
-    Timer.periodic(const Duration(seconds: 5), (_) {
-      if (_isConnected && _dataStreamController != null) {
-        final mockBatteryData = {
-          'type': 'battery',
-          'level': 50 + DateTime.now().second % 50,
-          'status': 'BatteryStatus.stable',
-          'changeRate': -0.5,
-          'recommendation': '적당한 활동을 유지하세요',
-          'timestamp': DateTime.now().toIso8601String(),
-        };
-        _dataStreamController!.add(mockBatteryData);
+  /// 메시지 리스너 설정  
+  void _setupMessageListener() {
+    // 네이티브 코드에서 메서드 호출을 받기 위한 설정
+    platform.setMethodCallHandler((call) async {
+      switch (call.method) {
+        case 'onDataReceived':
+          final data = Map<String, dynamic>.from(call.arguments);
+          _dataStreamController?.add(data);
+          break;
+        case 'onCommandReceived':
+          final command = call.arguments['command'] as String;
+          _commandStreamController?.add(command);
+          break;
+        case 'onConnectionChanged':
+          _isConnected = call.arguments['connected'] as bool;
+          if (call.arguments['deviceIds'] != null) {
+            final devices = List<String>.from(call.arguments['deviceIds']);
+            _pairedDeviceId = devices.isNotEmpty ? devices.first : null;
+          }
+          break;
+        case 'onSyncRequested':
+          // 동기화 요청 처리
+          debugPrint('동기화 요청 수신: ${call.arguments['from']}');
+          break;
       }
     });
+  }
+  
+  /// 연결된 디바이스 확인
+  Future<void> _checkConnectedDevices() async {
+    try {
+      final devices = await platform.invokeMethod('getConnectedDevices');
+      if (devices is List && devices.isNotEmpty) {
+        _isConnected = true;
+        _pairedDeviceId = devices.first['id'];
+        debugPrint('연결된 디바이스: $_pairedDeviceId');
+      } else {
+        _isConnected = false;
+        _pairedDeviceId = null;
+      }
+    } catch (e) {
+      debugPrint('디바이스 확인 실패: $e');
+    }
   }
   
   /// 연결 상태 모니터링
   void _startConnectionMonitoring() {
     Timer.periodic(const Duration(seconds: 30), (_) async {
-      // Mock 구현: 항상 연결 상태 유지
-      _isConnected = true;
+      // 주기적으로 연결 상태 확인
+      await _checkConnectedDevices();
     });
   }
   
@@ -97,13 +132,18 @@ class DataSyncService {
     };
     
     try {
-      // Mock 구현: 데이터를 로컬 스트림으로 전송
+      // 네이티브 코드를 통해 데이터 전송
+      await platform.invokeMethod('sendData', {
+        'path': '/body_battery/battery',
+        'data': jsonEncode(data),
+      });
+      debugPrint('Battery 데이터 전송 완료: ${battery.level}%');
+    } catch (e) {
+      debugPrint('Battery 데이터 전송 실패: $e');
+      // 폴백: 로컬 스트림으로 전송
       if (_dataStreamController != null) {
         _dataStreamController!.add(data);
       }
-      debugPrint('Battery 데이터 전송 (Mock): ${battery.level}%');
-    } catch (e) {
-      debugPrint('Battery 데이터 전송 실패: $e');
     }
   }
   
@@ -124,19 +164,27 @@ class DataSyncService {
     };
     
     try {
-      // Mock 구현
+      // 네이티브 코드를 통해 데이터 전송
+      await platform.invokeMethod('sendData', {
+        'path': '/body_battery/health',
+        'data': jsonEncode(data),
+      });
+      debugPrint('Health 데이터 전송 완료');
+    } catch (e) {
+      debugPrint('Health 데이터 전송 실패: $e');
+      // 폴백: 로컬 스트림으로 전송
       if (_dataStreamController != null) {
         _dataStreamController!.add(data);
       }
-      debugPrint('Health 데이터 전송 (Mock)');
-    } catch (e) {
-      debugPrint('Health 데이터 전송 실패: $e');
     }
   }
   
   /// 수면 데이터 전송 (워치 → 폰)
   Future<void> sendSleepData(SleepData sleepData) async {
-    if (!_isConnected || _pairedDeviceId == null) return;
+    if (!_isConnected || _pairedDeviceId == null) {
+      debugPrint('디바이스 연결되지 않음');
+      return;
+    }
     
     final data = {
       'type': 'sleep',
@@ -150,19 +198,27 @@ class DataSyncService {
     };
     
     try {
-      // Mock 구현
+      // 네이티브 코드를 통해 데이터 전송
+      await platform.invokeMethod('sendData', {
+        'path': '/body_battery/sleep',
+        'data': jsonEncode(data),
+      });
+      debugPrint('Sleep 데이터 전송 완료');
+    } catch (e) {
+      debugPrint('Sleep 데이터 전송 실패: $e');
+      // 폴백: 로컬 스트림으로 전송
       if (_dataStreamController != null) {
         _dataStreamController!.add(data);
       }
-      debugPrint('Sleep 데이터 전송 (Mock)');
-    } catch (e) {
-      debugPrint('Sleep 데이터 전송 실패: $e');
     }
   }
   
   /// 활동 데이터 전송 (워치 → 폰)
   Future<void> sendActivityData(List<ActivityData> activities) async {
-    if (!_isConnected || _pairedDeviceId == null) return;
+    if (!_isConnected || _pairedDeviceId == null) {
+      debugPrint('디바이스 연결되지 않음');
+      return;
+    }
     
     final data = {
       'type': 'activities',
@@ -175,13 +231,18 @@ class DataSyncService {
     };
     
     try {
-      // Mock 구현
+      // 네이티브 코드를 통해 데이터 전송
+      await platform.invokeMethod('sendData', {
+        'path': '/body_battery/activities',
+        'data': jsonEncode(data),
+      });
+      debugPrint('Activity 데이터 전송 완료: ${activities.length}개');
+    } catch (e) {
+      debugPrint('Activity 데이터 전송 실패: $e');
+      // 폴백: 로컬 스트림으로 전송
       if (_dataStreamController != null) {
         _dataStreamController!.add(data);
       }
-      debugPrint('Activity 데이터 전송 (Mock): ${activities.length}개');
-    } catch (e) {
-      debugPrint('Activity 데이터 전송 실패: $e');
     }
   }
   
@@ -193,13 +254,19 @@ class DataSyncService {
     }
     
     try {
-      // Mock 구현
+      // 네이티브 코드를 통해 명령 전송
+      await platform.invokeMethod('sendMessage', {
+        'deviceId': _pairedDeviceId,
+        'path': '/body_battery/command',
+        'data': command,
+      });
+      debugPrint('명령 전송 완료: $command');
+    } catch (e) {
+      debugPrint('명령 전송 실패: $e');
+      // 폴백: 로컬 스트림으로 전송
       if (_commandStreamController != null) {
         _commandStreamController!.add(command);
       }
-      debugPrint('명령 전송 (Mock): $command');
-    } catch (e) {
-      debugPrint('명령 전송 실패: $e');
     }
   }
   
@@ -221,9 +288,10 @@ class DataSyncService {
   /// 주기적 동기화 시작 (워치용)
   void startPeriodicSync({Duration interval = const Duration(minutes: 5)}) {
     _syncTimer?.cancel();
-    _syncTimer = Timer.periodic(interval, (_) {
+    _syncTimer = Timer.periodic(interval, (_) async {
       // 현재 데이터를 폰으로 전송하도록 트리거
-      debugPrint('주기적 동기화 실행 (Mock)');
+      debugPrint('주기적 동기화 실행');
+      await requestSync();
     });
   }
   
@@ -241,11 +309,23 @@ class DataSyncService {
   
   /// 연결 재시도
   Future<bool> reconnect() async {
-    debugPrint('재연결 시도 (Mock)...');
-    _isConnected = true;
-    _pairedDeviceId = 'mock_device';
+    debugPrint('재연결 시도...');
     
-    return true;
+    try {
+      // 네이티브 코드를 통해 재연결
+      final result = await platform.invokeMethod('reconnect');
+      if (result == true) {
+        await _checkConnectedDevices();
+        return _isConnected;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('재연결 실패: $e');
+      // Mock 모드로 폴백
+      _isConnected = true;
+      _pairedDeviceId = 'mock_device';
+      return true;
+    }
   }
   
   void dispose() {

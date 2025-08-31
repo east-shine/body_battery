@@ -76,6 +76,7 @@ class WearDataLayerPlugin : FlutterPlugin, MethodCallHandler, CoroutineScope,
             "sendData" -> sendData(call, result)
             "requestSync" -> requestSync(result)
             "isConnected" -> isConnected(result)
+            "reconnect" -> reconnect(result)
             else -> result.notImplemented()
         }
     }
@@ -209,6 +210,26 @@ class WearDataLayerPlugin : FlutterPlugin, MethodCallHandler, CoroutineScope,
     
     private fun isConnected(result: Result) {
         result.success(connectedNodes.isNotEmpty())
+    }
+    
+    private fun reconnect(result: Result) {
+        launch {
+            try {
+                // 노드 재탐색
+                findConnectedNodes()
+                delay(500) // 잠시 대기
+                
+                // 연결 확인
+                val nodes = nodeClient.connectedNodes.await()
+                if (nodes.isNotEmpty()) {
+                    result.success(true)
+                } else {
+                    result.success(false)
+                }
+            } catch (e: Exception) {
+                result.error("RECONNECT_ERROR", "재연결 실패: ${e.message}", null)
+            }
+        }
     }
     
     // DataClient.OnDataChangedListener 구현
