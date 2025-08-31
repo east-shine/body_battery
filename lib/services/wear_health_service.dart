@@ -7,10 +7,10 @@ import '../models/health_data.dart';
 /// 워치 전용 - 실시간 센서 접근
 class WearHealthService {
   static const platform = MethodChannel('com.body_battery/health_services');
-  
+
   StreamController<HealthData>? _dataStreamController;
   Timer? _passiveMonitoringTimer;
-  
+
   // 지원되는 데이터 타입
   static const List<String> supportedDataTypes = [
     'HEART_RATE',
@@ -28,7 +28,7 @@ class WearHealthService {
     try {
       final result = await platform.invokeMethod('initialize');
       debugPrint('Health Services 초기화: $result');
-      
+
       // result가 Map인 경우 success 필드 확인
       if (result is Map) {
         return result['success'] == true;
@@ -54,13 +54,13 @@ class WearHealthService {
         'dataTypes': supportedDataTypes,
         'intervalMinutes': 5,
       });
-      
+
       // 주기적으로 데이터 가져오기
       _passiveMonitoringTimer = Timer.periodic(
         const Duration(minutes: 5),
         (_) => _fetchLatestData(),
       );
-      
+
       debugPrint('패시브 모니터링 시작됨');
     } catch (e) {
       debugPrint('패시브 모니터링 시작 실패: $e');
@@ -81,8 +81,10 @@ class WearHealthService {
   /// 현재 센서 데이터 즉시 가져오기
   Future<HealthData?> getCurrentData() async {
     try {
-      final Map<dynamic, dynamic> result = await platform.invokeMethod('getCurrentData');
-      
+      final Map<dynamic, dynamic> result = await platform.invokeMethod(
+        'getCurrentData',
+      );
+
       return HealthData(
         timestamp: DateTime.now(),
         heartRate: result['heartRate'] as int?,
@@ -110,12 +112,13 @@ class WearHealthService {
   /// 수면 데이터 가져오기
   Future<SleepData?> getSleepData(DateTime date) async {
     try {
-      final Map<dynamic, dynamic> result = await platform.invokeMethod('getSleepData', {
-        'date': date.millisecondsSinceEpoch,
-      });
-      
+      final Map<dynamic, dynamic> result = await platform.invokeMethod(
+        'getSleepData',
+        {'date': date.millisecondsSinceEpoch},
+      );
+
       if (result.isEmpty) return null;
-      
+
       return SleepData(
         startTime: DateTime.fromMillisecondsSinceEpoch(result['startTime']),
         endTime: DateTime.fromMillisecondsSinceEpoch(result['endTime']),
@@ -134,16 +137,21 @@ class WearHealthService {
   /// 운동 데이터 가져오기
   Future<List<ActivityData>> getActivityData(DateTime date) async {
     try {
-      final List<dynamic> results = await platform.invokeMethod('getActivityData', {
-        'date': date.millisecondsSinceEpoch,
-      });
-      
-      return results.map((data) => ActivityData(
-        type: data['type'] as String,
-        durationMinutes: data['durationMinutes'] as int,
-        intensity: data['intensity'] as double,
-        caloriesBurned: data['caloriesBurned'] as int,
-      )).toList();
+      final List<dynamic> results = await platform.invokeMethod(
+        'getActivityData',
+        {'date': date.millisecondsSinceEpoch},
+      );
+
+      return results
+          .map(
+            (data) => ActivityData(
+              type: data['type'] as String,
+              durationMinutes: data['durationMinutes'] as int,
+              intensity: data['intensity'] as double,
+              caloriesBurned: data['caloriesBurned'] as int,
+            ),
+          )
+          .toList();
     } catch (e) {
       debugPrint('활동 데이터 가져오기 실패: $e');
       return [];
@@ -154,8 +162,10 @@ class WearHealthService {
   Future<void> subscribeToDataUpdates() async {
     try {
       // Native 메서드 채널로 이벤트 구독
-      const EventChannel eventChannel = EventChannel('com.body_battery/health_events');
-      
+      const EventChannel eventChannel = EventChannel(
+        'com.body_battery/health_events',
+      );
+
       eventChannel.receiveBroadcastStream().listen(
         (dynamic event) {
           final Map<String, dynamic> data = Map<String, dynamic>.from(event);
@@ -166,7 +176,7 @@ class WearHealthService {
             steps: data['steps'] as int?,
             stressLevel: data['stressLevel'] as double?,
           );
-          
+
           _dataStreamController?.add(healthData);
         },
         onError: (dynamic error) {
@@ -185,7 +195,6 @@ class WearHealthService {
       _dataStreamController!.add(data);
     }
   }
-
 
   void dispose() {
     _passiveMonitoringTimer?.cancel();

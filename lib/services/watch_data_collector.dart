@@ -213,6 +213,9 @@ class WatchDataCollector {
   /// 배터리 스트림 (워치 로컬 UI 업데이트용)
   Stream<BodyBattery> get batteryStream => _batteryCalculator.batteryStream;
   
+  /// 헬스 데이터 스트림 (워치 로컬 UI 업데이트용)
+  Stream<HealthData> get healthDataStream => _healthService.dataStream;
+  
   /// 연결 상태 확인
   bool get isConnectedToPhone => _syncService.isConnected;
   
