@@ -483,7 +483,10 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
       children: [
         Icon(icon, size: 12, color: color),
         const SizedBox(width: 4),
-        Text(label, style: const TextStyle(color: Colors.white54, fontSize: 10)),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white54, fontSize: 10),
+        ),
         const Spacer(),
         Text(
           value,
@@ -505,7 +508,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.grey.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
@@ -516,14 +519,14 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
         children: [
           Row(
             children: [
-              Icon(icon, color: color, size: 14),
+              Icon(icon, color: color, size: 16),
               const SizedBox(width: 4),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     label,
-                    style: TextStyle(color: Colors.white70, fontSize: 9),
+                    style: TextStyle(color: Colors.white70, fontSize: 11),
                   ),
                   Text(
                     impact,
@@ -534,7 +537,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                               : impact.startsWith('-')
                               ? Colors.orange
                               : Colors.white60,
-                      fontSize: 8,
+                      fontSize: 10,
                     ),
                   ),
                 ],
@@ -545,7 +548,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
             value,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 12,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -562,7 +565,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -580,9 +583,9 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
         children: [
           Row(
             children: [
-              Icon(icon, size: 12, color: color),
+              Icon(icon, size: 14, color: color),
               const SizedBox(width: 4),
-              Text(label, style: TextStyle(color: Colors.white60, fontSize: 9)),
+              Text(label, style: TextStyle(color: Colors.white60, fontSize: 11)),
             ],
           ),
           Row(
@@ -593,7 +596,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 value,
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -601,7 +604,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 const SizedBox(width: 1),
                 Text(
                   unit,
-                  style: TextStyle(color: Colors.white54, fontSize: 8),
+                  style: TextStyle(color: Colors.white54, fontSize: 10),
                 ),
               ],
             ],
