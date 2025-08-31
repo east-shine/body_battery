@@ -172,7 +172,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
               // 상태 텍스트
               Text(
                 _currentBattery!.statusText,
-                style: const TextStyle(color: Colors.white70, fontSize: 12),
+                style: const TextStyle(color: Colors.white70, fontSize: 14),
               ),
 
               const SizedBox(height: 2),
@@ -188,7 +188,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                   _currentBattery!.levelDescription.split(' - ')[0],
                   style: TextStyle(
                     color: _currentBattery!.color,
-                    fontSize: 9,
+                    fontSize: 11,
                     fontWeight: FontWeight.w500,
                   ),
                   textAlign: TextAlign.center,
@@ -202,7 +202,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
                   _getShortRecommendation(),
-                  style: const TextStyle(color: Colors.white54, fontSize: 8),
+                  style: const TextStyle(color: Colors.white54, fontSize: 10),
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -292,7 +292,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
             '상세 정보',
             style: TextStyle(
               color: Colors.white70,
-              fontSize: 11,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -345,7 +345,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
             '계산 근거',
             style: TextStyle(
               color: Colors.white70,
-              fontSize: 11,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -417,13 +417,13 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 '추가 정보',
                 style: TextStyle(
                   color: Colors.white70,
-                  fontSize: 11,
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
                 _getLastUpdateTime(),
-                style: const TextStyle(color: Colors.white38, fontSize: 9),
+                style: const TextStyle(color: Colors.white38, fontSize: 10),
               ),
             ],
           ),
@@ -443,9 +443,10 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
               _buildSensorCard(
                 icon: Icons.speed,
                 label: '평균 심박',
-                value: _currentHeartRate != null 
-                  ? '${(_currentHeartRate! * 0.85).round()}'
-                  : '--',
+                value:
+                    _currentHeartRate != null
+                        ? '${(_currentHeartRate! * 0.85).round()}'
+                        : '--',
                 unit: 'bpm',
                 color: Colors.pink,
               ),
@@ -482,13 +483,13 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
       children: [
         Icon(icon, size: 12, color: color),
         const SizedBox(width: 4),
-        Text(label, style: const TextStyle(color: Colors.white54, fontSize: 9)),
+        Text(label, style: const TextStyle(color: Colors.white54, fontSize: 10)),
         const Spacer(),
         Text(
           value,
           style: TextStyle(
             color: color,
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -522,7 +523,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 children: [
                   Text(
                     label,
-                    style: TextStyle(color: Colors.white70, fontSize: 7),
+                    style: TextStyle(color: Colors.white70, fontSize: 9),
                   ),
                   Text(
                     impact,
@@ -533,7 +534,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                               : impact.startsWith('-')
                               ? Colors.orange
                               : Colors.white60,
-                      fontSize: 6,
+                      fontSize: 8,
                     ),
                   ),
                 ],
@@ -544,7 +545,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
             value,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 11,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -581,7 +582,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
             children: [
               Icon(icon, size: 12, color: color),
               const SizedBox(width: 4),
-              Text(label, style: TextStyle(color: Colors.white60, fontSize: 7)),
+              Text(label, style: TextStyle(color: Colors.white60, fontSize: 9)),
             ],
           ),
           Row(
@@ -592,7 +593,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 value,
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 11,
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -600,7 +601,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 const SizedBox(width: 1),
                 Text(
                   unit,
-                  style: TextStyle(color: Colors.white54, fontSize: 6),
+                  style: TextStyle(color: Colors.white54, fontSize: 8),
                 ),
               ],
             ],
@@ -684,7 +685,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
     if (_currentSteps! >= 2000) return Colors.yellow[700]!;
     return Colors.orange;
   }
-  
+
   String _getActivityIntensity() {
     if (_currentHeartRate == null) return '--';
     if (_currentHeartRate! >= 140) return '매우 높음';
@@ -693,7 +694,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
     if (_currentHeartRate! >= 70) return '낮음';
     return '휴식';
   }
-  
+
   String _getRecoveryRate() {
     if (_currentHRV == null || _currentStressLevel == null) return '--';
     if (_currentHRV! >= 50 && _currentStressLevel! <= 30) return '빠름';
