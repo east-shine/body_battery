@@ -351,14 +351,8 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
           ),
           const SizedBox(height: 8),
 
-          // 2x2 그리드로 표시
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 4,
-            crossAxisSpacing: 4,
-            childAspectRatio: 2.2,
+          // 세로 리스트로 표시
+          Column(
             children: [
               _buildFactorCard(
                 icon: Icons.favorite_border,
@@ -370,6 +364,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 impact: _getHRVImpact(),
                 color: _getHRVColor(),
               ),
+              const SizedBox(height: 4),
               _buildFactorCard(
                 icon: Icons.psychology_outlined,
                 label: '스트레스',
@@ -380,6 +375,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 impact: _getStressImpact(),
                 color: _getStressColor(),
               ),
+              const SizedBox(height: 4),
               _buildFactorCard(
                 icon: Icons.monitor_heart_outlined,
                 label: '심박수',
@@ -390,6 +386,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 impact: _getHeartRateImpact(),
                 color: _getHeartRateColor(),
               ),
+              const SizedBox(height: 4),
               _buildFactorCard(
                 icon: Icons.directions_walk,
                 label: '활동량',
@@ -432,14 +429,8 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
           ),
           const SizedBox(height: 8),
 
-          // 센서 데이터 2x2 그리드
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            childAspectRatio: 1.4,
+          // 센서 데이터 세로 리스트
+          Column(
             children: [
               _buildSensorCard(
                 icon: Icons.favorite,
@@ -448,6 +439,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 unit: 'bpm',
                 color: Colors.red,
               ),
+              const SizedBox(height: 4),
               _buildSensorCard(
                 icon: Icons.timeline,
                 label: 'HRV',
@@ -458,6 +450,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 unit: 'ms',
                 color: Colors.blue,
               ),
+              const SizedBox(height: 4),
               _buildSensorCard(
                 icon: Icons.directions_walk,
                 label: '걸음수',
@@ -471,6 +464,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                     _currentSteps != null && _currentSteps! >= 1000 ? '' : '걸음',
                 color: Colors.green,
               ),
+              const SizedBox(height: 4),
               _buildSensorCard(
                 icon: Icons.psychology,
                 label: '스트레스',
@@ -538,16 +532,17 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
                 children: [
                   Text(
                     label,
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 7,
-                    ),
+                    style: TextStyle(color: Colors.white70, fontSize: 7),
                   ),
                   Text(
                     impact,
                     style: TextStyle(
-                      color: impact.startsWith('+') ? Colors.green : 
-                             impact.startsWith('-') ? Colors.orange : Colors.white60,
+                      color:
+                          impact.startsWith('+')
+                              ? Colors.green
+                              : impact.startsWith('-')
+                              ? Colors.orange
+                              : Colors.white60,
                       fontSize: 6,
                     ),
                   ),
