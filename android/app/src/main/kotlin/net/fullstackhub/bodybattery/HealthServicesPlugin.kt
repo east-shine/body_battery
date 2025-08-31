@@ -10,15 +10,18 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import io.flutter.plugin.common.EventChannel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 import com.google.android.gms.tasks.Task
 import kotlin.coroutines.CoroutineContext
 
-class HealthServicesPlugin : FlutterPlugin, MethodCallHandler, CoroutineScope {
+class HealthServicesPlugin : FlutterPlugin, MethodCallHandler, EventChannel.StreamHandler, CoroutineScope {
     private lateinit var channel: MethodChannel
+    private lateinit var eventChannel: EventChannel
     private lateinit var context: Context
     private lateinit var healthServicesClient: HealthServicesClient
+    private var eventSink: EventChannel.EventSink? = null
     
     // Coroutine scope
     private val job = Job()
@@ -35,6 +38,7 @@ class HealthServicesPlugin : FlutterPlugin, MethodCallHandler, CoroutineScope {
     
     companion object {
         private const val CHANNEL_NAME = "com.body_battery/health_services"
+        private const val EVENT_CHANNEL_NAME = "com.body_battery/health_events"
     }
     
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -42,12 +46,27 @@ class HealthServicesPlugin : FlutterPlugin, MethodCallHandler, CoroutineScope {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, CHANNEL_NAME)
         channel.setMethodCallHandler(this)
         
+        eventChannel = EventChannel(flutterPluginBinding.binaryMessenger, EVENT_CHANNEL_NAME)
+        eventChannel.setStreamHandler(this)
+        
         healthServicesClient = HealthServices.getClient(context)
     }
     
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
+        eventChannel.setStreamHandler(null)
         job.cancel()
+    }
+    
+    // EventChannel.StreamHandler 구현
+    override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+        eventSink = events
+        // 실시간 데이터 업데이트 시작
+        startDataUpdates()
+    }
+    
+    override fun onCancel(arguments: Any?) {
+        eventSink = null
     }
     
     override fun onMethodCall(call: MethodCall, result: Result) {
@@ -219,11 +238,30 @@ class HealthServicesPlugin : FlutterPlugin, MethodCallHandler, CoroutineScope {
     }
     
     private fun sendDataToFlutter(type: String, value: Any) {
-        channel.invokeMethod("onDataUpdate", mapOf(
+        // EventSink로 데이터 전송
+        eventSink?.success(mapOf(
             "type" to type,
             "value" to value,
             "timestamp" to System.currentTimeMillis()
         ))
+    }
+    
+    private fun startDataUpdates() {
+        launch {
+            while (eventSink != null) {
+                delay(5000) // 5초마다 업데이트
+                
+                // Mock 데이터 생성 및 전송
+                val data = mapOf(
+                    "heartRate" to (70 + (Math.random() * 30).toInt()),
+                    "hrv" to (40.0 + Math.random() * 40.0),
+                    "steps" to ((lastSteps ?: 5000) + (Math.random() * 10).toInt()),
+                    "stressLevel" to calculateStressFromHRV(40.0 + Math.random() * 40.0)
+                )
+                
+                eventSink?.success(data)
+            }
+        }
     }
     
     private fun calculateMockHRV(): Double {
