@@ -69,7 +69,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
 
         // 배경 동기화 시작
         _dataCollector.startBackgroundSync();
-        
+
         // 초기 센서 데이터 가져오기
         final initialHealthData = await _dataCollector.getCurrentHealthData();
         if (initialHealthData != null) {
