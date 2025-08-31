@@ -155,20 +155,7 @@ class _BatteryGaugePainter extends CustomPainter {
         center - Offset(textPainter.width / 2, textPainter.height / 2),
       );
 
-      // 상태 텍스트
-      final statusText = _getStatusText();
-      final statusPainter = TextPainter(
-        text: TextSpan(
-          text: statusText,
-          style: TextStyle(fontSize: radius * 0.12, color: Colors.grey[600]),
-        ),
-        textDirection: TextDirection.ltr,
-      );
-      statusPainter.layout();
-      statusPainter.paint(
-        canvas,
-        Offset(center.dx - statusPainter.width / 2, center.dy + radius * 0.3),
-      );
+      // 상태 텍스트 제거 (워치 화면에서 중복 표시 방지)
     }
 
     // 애니메이션 효과 (충전 중일 때)
@@ -183,17 +170,6 @@ class _BatteryGaugePainter extends CustomPainter {
         final animRadius = radius * (0.85 + i * 0.05);
         canvas.drawCircle(center, animRadius, chargingPaint);
       }
-    }
-  }
-
-  String _getStatusText() {
-    switch (status) {
-      case BatteryStatus.charging:
-        return '충전 중';
-      case BatteryStatus.draining:
-        return '소모 중';
-      case BatteryStatus.stable:
-        return '안정';
     }
   }
 
