@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:discover.garmin.com)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
