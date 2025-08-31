@@ -186,25 +186,6 @@ class WearHealthService {
     }
   }
 
-  /// 수면 품질 계산
-  double _calculateSleepQuality(Map<dynamic, dynamic> sleepData) {
-    final deep = sleepData['deepSleepMinutes'] ?? 0;
-    final rem = sleepData['remSleepMinutes'] ?? 0;
-    final light = sleepData['lightSleepMinutes'] ?? 0;
-    final awake = sleepData['awakeMinutes'] ?? 0;
-    final total = deep + rem + light;
-    
-    if (total == 0) return 0;
-    
-    final deepScore = (deep / total) * 40;
-    final remScore = (rem / total) * 30;
-    final lightScore = (light / total) * 20;
-    final awakeDeduction = (awake / total) * 30;
-    final durationScore = (total / 480).clamp(0, 1) * 10;
-    
-    return (deepScore + remScore + lightScore + durationScore - awakeDeduction)
-        .clamp(0, 100);
-  }
 
   void dispose() {
     _passiveMonitoringTimer?.cancel();
