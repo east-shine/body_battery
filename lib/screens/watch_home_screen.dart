@@ -233,7 +233,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
               // 센서 데이터 셉션
               _buildSensorDataSection(context),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -585,7 +585,10 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
             children: [
               Icon(icon, size: 14, color: color),
               const SizedBox(width: 4),
-              Text(label, style: TextStyle(color: Colors.white60, fontSize: 11)),
+              Text(
+                label,
+                style: TextStyle(color: Colors.white60, fontSize: 11),
+              ),
             ],
           ),
           Row(
