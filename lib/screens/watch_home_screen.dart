@@ -25,32 +25,47 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
   }
   
   Future<void> _initializeDataCollector() async {
-    _dataCollector = WatchDataCollector();
-    
-    final initialized = await _dataCollector.initialize();
-    if (initialized) {
-      // 배터리 스트림 구독
-      _dataCollector.batteryStream.listen((battery) {
+    try {
+      _dataCollector = WatchDataCollector();
+      
+      final initialized = await _dataCollector.initialize();
+      if (initialized) {
+        // 배터리 스트림 구독
+        _dataCollector.batteryStream.listen((battery) {
+          if (mounted) {
+            setState(() {
+              _currentBattery = battery;
+            });
+          }
+        }, onError: (error) {
+          debugPrint('배터리 스트림 에러: $error');
+        });
+        
+        // 배경 동기화 시작
+        _dataCollector.startBackgroundSync();
+        
         if (mounted) {
           setState(() {
-            _currentBattery = battery;
+            _currentBattery = _dataCollector.getCurrentBattery();
+            _isConnectedToPhone = _dataCollector.isConnectedToPhone;
+            _isMonitoring = _dataCollector.isMonitoring;
+            _isLoading = false;
           });
         }
-      });
-      
-      // 배경 동기화 시작
-      _dataCollector.startBackgroundSync();
-      
-      setState(() {
-        _currentBattery = _dataCollector.getCurrentBattery();
-        _isConnectedToPhone = _dataCollector.isConnectedToPhone;
-        _isMonitoring = _dataCollector.isMonitoring;
-        _isLoading = false;
-      });
-    } else {
-      setState(() {
-        _isLoading = false;
-      });
+      } else {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint('데이터 수집기 초기화 실패: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
   
